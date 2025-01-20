@@ -26,16 +26,29 @@ struct WorkoutDetailView: View {
         .onAppear {
             initializeData()
         }
+        .onDisappear {
+            saveTrackingData()
+        }
         .navigationTitle(workout.name)
     }
 
     private func initializeData() {
-        if !isInitialized {
-            for exercise in workout.exercises {
-                trackingData[exercise.id] = trackingData[exercise.id] ?? ExerciseTracking(reps: 0, sets: 0, weight: 0.0)
-                addedEntries[exercise.id] = addedEntries[exercise.id] ?? []
-            }
-            isInitialized = true
+        // Load saved workouts and find this workout's tracking data
+        let workouts = PersistenceManager.loadWorkouts()
+        if let savedWorkout = workouts.first(where: { $0.id == workout.id }) {
+            trackingData = savedWorkout.trackingData
+            addedEntries = savedWorkout.addedEntries
         }
+        isInitialized = true
+    }
+
+    private func saveTrackingData() {
+        // Load all workouts, update this workout, and save back
+        var workouts = PersistenceManager.loadWorkouts()
+        if let index = workouts.firstIndex(where: { $0.id == workout.id }) {
+            workouts[index].trackingData = trackingData
+            workouts[index].addedEntries = addedEntries
+        }
+        PersistenceManager.saveWorkouts(workouts)
     }
 }
