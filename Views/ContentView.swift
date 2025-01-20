@@ -57,7 +57,7 @@ struct ContentView: View {
                     }
                     .padding()
                 }
-                .navigationTitle("Exercises & Workouts")
+                .navigationTitle("Gym Tracker ✌️")
             }
         }
     }
