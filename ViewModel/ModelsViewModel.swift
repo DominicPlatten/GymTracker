@@ -25,6 +25,13 @@ class ModelsViewModel: ObservableObject {
         workouts.append(newWorkout)
         PersistenceManager.saveWorkouts(workouts)
     }
+    
+    func deleteWorkout(_ workout: Workout) {
+        if let index = workouts.firstIndex(where: { $0.id == workout.id }) {
+            workouts.remove(at: index)
+            PersistenceManager.saveWorkouts(workouts)
+        }
+    }
 
     func trackWorkout(workout: Workout, trackingData: [UUID: ExerciseTracking]) {
         if let index = workouts.firstIndex(where: { $0.id == workout.id }) {

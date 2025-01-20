@@ -32,12 +32,16 @@ struct ExerciseView: View {
             Spacer()
 
             // Add Entry Button
-            addEntryButton
+            if selectedView == .list {
+                addEntryButton
+            }
         }
         .navigationTitle(exercise.name)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                EditButton()
+                if selectedView == .list {
+                    EditButton()
+                }
             }
         }
     }
@@ -111,8 +115,9 @@ struct ExerciseView: View {
     private var chartView: some View {
         Chart {
             ForEach(Array(exercise.entries.enumerated()), id: \.offset) { index, entry in
+                // LineMark for the line
                 LineMark(
-                    x: .value("Index", index + 1),
+                    x: .value("Index", index),
                     y: .value("Weight", entry.weight)
                 )
                 .interpolationMethod(.catmullRom) // Smooth rounded line
@@ -121,13 +126,28 @@ struct ExerciseView: View {
                     startPoint: .leading,
                     endPoint: .trailing
                 ))
+                
+                // PointMark for the circles
+                PointMark(
+                    x: .value("Index", index),
+                    y: .value("Weight", entry.weight)
+                )
+                .symbolSize(50) // Adjust the size of the circle
+                .foregroundStyle(Color.black) // Color for the circles
+                
+                // Annotation for the weight value
+                .annotation(position: .top) {
+                    Text("\(String(format: "%.1f", entry.weight)) kg")
+                        .font(.caption)
+                        .foregroundColor(.black)
+                }
             }
         }
         .chartXAxis {
-            AxisMarks(values: .stride(by: 1)) { value in
-                if let index = value.as(Int.self) {
-                    AxisValueLabel("Entry \(index)") // Show "Entry 1", "Entry 2", etc.
-                }
+            AxisMarks(values: .stride(by: 1)) { _ in
+                // No AxisValueLabel here, so labels won't be shown
+                AxisTick()
+                //AxisGridLine()
             }
         }
         .padding()
