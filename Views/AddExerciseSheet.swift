@@ -18,7 +18,7 @@ struct AddExerciseSheet: View {
                 }
 
                 // Inputs for reps, sets, and weight
-                Section(header: Text("Workout Details")) {
+                Section(header: Text("Details")) {
                     Stepper("Reps: \(reps)", value: $reps, in: 0...100)
                     Stepper("Sets: \(sets)", value: $sets, in: 0...20)
 
@@ -29,6 +29,8 @@ struct AddExerciseSheet: View {
                 }
             }
             .navigationTitle("Add Exercise")
+            .navigationBarTitleDisplayMode(.inline)
+            
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button("Save") {
