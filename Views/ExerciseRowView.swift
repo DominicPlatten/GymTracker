@@ -4,6 +4,7 @@ struct ExerciseRowView: View {
     let exercise: Exercise
     @Binding var trackingData: [UUID: ExerciseTracking]
     @Binding var addedEntries: [UUID: [ExerciseTracking]]
+    var onAddEntry: (UUID, String, Int, Int, Double) -> Void // Add closure
 
     var body: some View {
         Section(header: Text(exercise.name)) {
@@ -71,6 +72,10 @@ struct ExerciseRowView: View {
     private func addTrackingData(for id: UUID) {
         let tracking = trackingData[id] ?? ExerciseTracking()
         addedEntries[id, default: []].append(tracking)
+
+        // Call the closure to save the entry to the corresponding exercise
+        onAddEntry(id, exercise.name, tracking.reps, tracking.sets, tracking.weight)
+
         trackingData[id] = ExerciseTracking() // Reset input fields
     }
 }

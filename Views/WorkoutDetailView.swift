@@ -18,7 +18,16 @@ struct WorkoutDetailView: View {
                     ExerciseRowView(
                         exercise: exercise,
                         trackingData: $trackingData,
-                        addedEntries: $addedEntries
+                        addedEntries: $addedEntries,
+                        onAddEntry: { exerciseId, name, reps, sets, weight in
+                            viewModel.addEntry(
+                                toExerciseId: exerciseId,
+                                name: name,
+                                reps: reps,
+                                sets: sets,
+                                weight: weight
+                            )
+                        }
                     )
                 }
             }
