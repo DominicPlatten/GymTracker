@@ -34,7 +34,7 @@ struct WorkoutDetailView: View {
 
                         // Add Entry Button
                         Button(action: { selectExercise(exercise) }) {
-                            Text("Add Entry")
+                            Text("Add")
                                 .fontWeight(.regular)
                                 .padding(.vertical, 4)
                                 .frame(maxWidth: .infinity)

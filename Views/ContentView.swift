@@ -68,8 +68,9 @@ struct ContentListView: View {
             List {
                 Section(header: Text("WORKOUTS")
                             .font(.title2)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.bottom, 0)) {
+                            .foregroundColor(.black)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity, alignment: .center)) {
                     ForEach(viewModel.workouts) { workout in
                         HStack {
                             NavigationLink(
@@ -101,7 +102,7 @@ struct ContentListView: View {
                     
                     Button(action: {isAddingWorkout = true}) {
                         Text("Add")
-                            .buttonStyle(PlainButtonStyle())
+                            .foregroundColor(.accentColor)
                             .sheet(isPresented: $isAddingWorkout) {
                                 AddWorkoutSheet(viewModel: viewModel, isAddingWorkout: $isAddingWorkout)
                             }
@@ -111,8 +112,9 @@ struct ContentListView: View {
                 
                 Section(header: Text("EXERCISES")
                             .font(.title2)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.bottom, 0)) {
+                            .foregroundColor(.black)
+                            .padding(.vertical, 10)
+                            .frame(maxWidth: .infinity, alignment: .center)) {
                     ForEach(viewModel.exercises) { exercise in
                         HStack {
                             NavigationLink(destination: ExerciseView(viewModel: viewModel, exercise: exercise)) {
@@ -130,6 +132,7 @@ struct ContentListView: View {
             
                     Button(action: { isAddingExercise = true }) {
                         Text("Add")
+                            .foregroundColor(.accentColor)
                             .sheet(isPresented: $isAddingExercise) {
                                 AddExerciseSheet(viewModel: viewModel, isAddingExercise: $isAddingExercise)
                             }

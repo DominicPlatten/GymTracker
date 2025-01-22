@@ -110,49 +110,121 @@ struct ExerciseView: View {
             }
             .onDelete(perform: deleteEntry)
         }
+        .scrollContentBackground(.hidden)
+        .background(Color.white)
     }
 
     private var chartView: some View {
-        Chart {
-            ForEach(Array(exercise.entries.enumerated()), id: \.offset) { index, entry in
-                // LineMark for the line
-                LineMark(
-                    x: .value("Index", index),
-                    y: .value("Weight", entry.weight)
-                )
-                .interpolationMethod(.catmullRom) // Smooth rounded line
-                .foregroundStyle(LinearGradient(
-                    gradient: Gradient(colors: [Color.blue, Color.purple]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                ))
-                
-                // PointMark for the circles
-                PointMark(
-                    x: .value("Index", index),
-                    y: .value("Weight", entry.weight)
-                )
-                .symbolSize(50) // Adjust the size of the circle
-                .foregroundStyle(Color.black) // Color for the circles
-                
-                // Annotation for the weight value
-                .annotation(position: .top) {
-                    Text("\(String(format: "%.1f", entry.weight)) kg")
-                        .font(.caption)
-                        .foregroundColor(.black)
-                }
-            }
-        }
-        .chartXAxis {
-            AxisMarks(values: .stride(by: 1)) { _ in
-                // No AxisValueLabel here, so labels won't be shown
-                AxisTick()
-                //AxisGridLine()
-            }
-        }
-        .padding()
-    }
+        // 1) Pre-calculate stats
+        let weights = exercise.entries.map { $0.weight }
+        let maxWeight = weights.max() ?? 0
+        let averageWeight = weights.isEmpty ? 0 : weights.reduce(0, +) / Double(weights.count)
+        let totalWeight = weights.reduce(0, +) // Sum of raw weights; if you want training volume, multiply reps*sets*weight.
 
+        return GeometryReader { geometry in
+            VStack {
+                // 2) The Chart (with horizontal scroll if needed)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    Chart {
+                        // Plot each data point
+                        ForEach(Array(exercise.entries.enumerated()), id: \.offset) { index, entry in
+                            LineMark(
+                                x: .value("Index", index),
+                                y: .value("Weight", entry.weight)
+                            )
+                            .interpolationMethod(.catmullRom)
+                            .foregroundStyle(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [.blue, .purple]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            
+                            PointMark(
+                                x: .value("Index", index),
+                                y: .value("Weight", entry.weight)
+                            )
+                            .symbolSize(50)
+                            .foregroundStyle(.black)
+                            .annotation(position: .top) {
+                                Text("\(entry.weight, specifier: "%.1f") kg")
+                                    .font(.caption)
+                                    .foregroundColor(.black)
+                            }
+                        }
+                        
+                        // A horizontal "average weight" line
+                        RuleMark(y: .value("Average", averageWeight))
+                            .foregroundStyle(.green)
+                            .lineStyle(StrokeStyle(lineWidth: 2, dash: [6]))
+                            .annotation(position: .top, alignment: .leading) {
+                                Text("Avg: \(averageWeight, specifier: "%.1f") kg")
+                                    .foregroundColor(.green)
+                                    .font(.caption2)
+                            }
+                    }
+                    // Pin Y-axis to the left
+                    .chartYAxis {
+                        //AxisMarks(position: .leading)
+                    }
+                    // Use Array(...) for X-axis values to avoid range conversion errors
+                    .chartXAxis {
+                        AxisMarks(values: Array(0 ..< exercise.entries.count)) { value in
+                            AxisTick()
+                            AxisGridLine()
+                            /*AxisValueLabel {
+                                if let index = value.as(Int.self),
+                                   index < exercise.entries.count {
+                                    Text(exercise.entries[index].date, style: .date)
+                                }
+                            }*/
+                        }
+                    }
+                    // Force minimum width and scroll if data is wide
+                    .frame(
+                        width: max(geometry.size.width, CGFloat(exercise.entries.count) * 60),
+                        height: 300
+                    )
+                    .padding()
+                }
+                
+                // 3) The Stat Tiles
+                HStack(spacing: 8) {
+                    statTile(title: "Max Weight", value: maxWeight)
+                    statTile(title: "Average Weight", value: averageWeight)
+                }
+                .frame(height: 100)       // Adjust the tile height as needed
+                .padding(.horizontal, 16)
+                
+                HStack(spacing: 8) {
+                    statTile(title: "Total Weight", value: totalWeight)
+                    statTile(title: "Placeholder", value: 0) // Your future custom stat
+                }
+                .frame(height: 100)       // Adjust the tile height as needed
+                .padding(.horizontal, 16) // Horizontal padding for the row
+            }
+        }
+        // Extra space for chart + tiles
+        .frame(height: 450)
+    }
+    
+    /// A reusable square tile showing a title and a numeric value.
+    private func statTile(title: String, value: Double) -> some View {
+        VStack(spacing: 8) {
+            Text(title)
+                .font(.subheadline)
+                .foregroundColor(.secondary)
+            Text("\(value, specifier: "%.1f")")
+                .font(.title2)
+                .fontWeight(.bold)
+        }
+        .frame(maxWidth: .infinity)                // Each tile expands equally in the HStack
+        .padding()
+        .background(Color.gray.opacity(0.2))
+        .cornerRadius(10)
+    }
+    
     private var addEntryButton: some View {
         Button(action: { isAddingEntry = true }) {
             Text("Add Entry")
@@ -182,5 +254,21 @@ struct ExerciseView: View {
         guard let exerciseIndex = viewModel.exercises.firstIndex(where: { $0.id == exercise.id }) else { return }
         viewModel.exercises[exerciseIndex].entries.remove(atOffsets: offsets)
         PersistenceManager.saveExercises(viewModel.exercises)
+    }
+}
+
+struct ExerciseView_Previews: PreviewProvider {
+    static var previews: some View {
+        let mockViewModel = ModelsViewModel()
+        let mockExercise = Exercise(
+            name: "Mock Exercise",
+            entries: [
+                ExerciseEntry(name: "Mock Entry 1", reps: 10, sets: 3, weight: 50.0, date: Date()),
+                ExerciseEntry(name: "Mock Entry 2", reps: 8, sets: 4, weight: 55.0, date: Date().addingTimeInterval(-86400))
+            ]
+        )
+        return NavigationView {
+            ExerciseView(viewModel: mockViewModel, exercise: mockExercise)
+        }
     }
 }
