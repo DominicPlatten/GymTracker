@@ -16,5 +16,17 @@ struct Workout: Codable, Identifiable {
         self.addedEntries = [:]
         self.lastTracked = nil
     }
-}
 
+    // MARK: - Clear All Entries
+    mutating func clearAllEntries() {
+        // Clear all entries in each exercise
+        for index in exercises.indices {
+            exercises[index].entries.removeAll()
+        }
+
+        // Optionally clear trackingData and addedEntries if needed
+        trackingData.removeAll()
+        addedEntries.removeAll()
+        lastTracked = nil
+    }
+}

@@ -72,7 +72,21 @@ struct ContentListView: View {
                             .padding(.bottom, 0)) {
                     ForEach(viewModel.workouts) { workout in
                         HStack {
-                            NavigationLink(destination: WorkoutDetailView(viewModel: viewModel, workout: workout)) {
+                            NavigationLink(
+                                destination: WorkoutDetailView(
+                                    viewModel: viewModel,
+                                    workout: Binding(
+                                        get: {
+                                            viewModel.workouts.first(where: { $0.id == workout.id }) ?? workout
+                                        },
+                                        set: { updatedWorkout in
+                                            if let index = viewModel.workouts.firstIndex(where: { $0.id == workout.id }) {
+                                                viewModel.workouts[index] = updatedWorkout
+                                            }
+                                        }
+                                    )
+                                )
+                            ) {
                                 Text(workout.name)
                             }
                             if isEditing {
@@ -87,7 +101,6 @@ struct ContentListView: View {
                     
                     Button(action: {isAddingWorkout = true}) {
                         Text("Add")
-                            .fontWeight(.regular)
                             .buttonStyle(PlainButtonStyle())
                             .sheet(isPresented: $isAddingWorkout) {
                                 AddWorkoutSheet(viewModel: viewModel, isAddingWorkout: $isAddingWorkout)
@@ -117,7 +130,6 @@ struct ContentListView: View {
             
                     Button(action: { isAddingExercise = true }) {
                         Text("Add")
-                            .fontWeight(.regular)
                             .sheet(isPresented: $isAddingExercise) {
                                 AddExerciseSheet(viewModel: viewModel, isAddingExercise: $isAddingExercise)
                             }

@@ -20,9 +20,23 @@ class ModelsViewModel: ObservableObject {
         PersistenceManager.saveExercises(exercises)
     }
 
-    func addWorkout(name: String, exercises: [Exercise]) {
-        let newWorkout = Workout(name: name, exercises: exercises)
+    func addWorkout(name: String, selectedExercises: [Exercise]) {
+        let workoutExercises = selectedExercises.compactMap { selectedExercise in
+            exercises.first(where: { $0.id == selectedExercise.id })
+        }
+        let newWorkout = Workout(name: name, exercises: workoutExercises)
+
+        // Add the new workout
         workouts.append(newWorkout)
+
+        // Clear all entries in the newly created workout
+        if let workoutIndex = workouts.firstIndex(where: { $0.id == newWorkout.id }) {
+            for index in workouts[workoutIndex].exercises.indices {
+                workouts[workoutIndex].exercises[index].entries.removeAll()
+            }
+        }
+
+        // Persist the changes
         PersistenceManager.saveWorkouts(workouts)
     }
     

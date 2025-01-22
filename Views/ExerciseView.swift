@@ -68,7 +68,7 @@ struct ExerciseView: View {
 
     private var listView: some View {
         List {
-            ForEach(exercise.entries) { entry in
+            ForEach(exercise.entries.sorted(by: { $0.date > $1.date })) { entry in
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 32) {
                         VStack(spacing: 4) {
@@ -164,7 +164,15 @@ struct ExerciseView: View {
         }
         .padding()
         .sheet(isPresented: $isAddingEntry) {
-            AddEntryView(viewModel: viewModel, exercise: exercise)
+            AddEntryView(
+                exercise: exercise,
+                onSave: { newEntry in
+                    guard let exerciseIndex = viewModel.exercises.firstIndex(where: { $0.id == exercise.id }) else { return }
+                    viewModel.exercises[exerciseIndex].entries.append(newEntry)
+                    PersistenceManager.saveExercises(viewModel.exercises)
+                    isAddingEntry = false
+                }
+            )
         }
     }
 

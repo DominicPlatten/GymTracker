@@ -51,11 +51,11 @@ struct AddWorkoutSheet: View {
                 // Save Button
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        let exercises = viewModel.exercises.filter { selectedExercises.contains($0.id) }
-                        viewModel.addWorkout(name: workoutName, exercises: exercises)
-                        isAddingWorkout = false // Dismiss the sheet
+                        let selectedExerciseObjects = viewModel.exercises.filter { selectedExercises.contains($0.id) }
+                        viewModel.addWorkout(name: workoutName, selectedExercises: selectedExerciseObjects)
+                        isAddingWorkout = false
                     }
-                    .disabled(workoutName.isEmpty || selectedExercises.isEmpty) // Disable if textfield is empty or no exercises are selected
+                    .disabled(workoutName.isEmpty || selectedExercises.isEmpty)
                 }
             }
         }
