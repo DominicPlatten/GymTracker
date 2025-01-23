@@ -11,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color(.systemGray6)
+                Color(Color.white)
                     .ignoresSafeArea()
                 
                 VStack {
@@ -67,10 +67,11 @@ struct ContentListView: View {
         if !viewModel.exercises.isEmpty || !viewModel.workouts.isEmpty {
             List {
                 Section(header: Text("WORKOUTS")
-                            .font(.title2)
+                            .font(.title)
+                            .fontWeight(.bold)
                             .foregroundColor(.black)
                             .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity, alignment: .center)) {
+                            .frame(maxWidth: .infinity, alignment: .leading)) {
                     ForEach(viewModel.workouts) { workout in
                         HStack {
                             NavigationLink(
@@ -109,12 +110,14 @@ struct ContentListView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
+
                 
                 Section(header: Text("EXERCISES")
-                            .font(.title2)
+                            .font(.title)
+                            .fontWeight(.bold)
                             .foregroundColor(.black)
                             .padding(.vertical, 10)
-                            .frame(maxWidth: .infinity, alignment: .center)) {
+                            .frame(maxWidth: .infinity, alignment: .leading)) {
                     ForEach(viewModel.exercises) { exercise in
                         HStack {
                             NavigationLink(destination: ExerciseView(viewModel: viewModel, exercise: exercise)) {
