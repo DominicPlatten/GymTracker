@@ -4,16 +4,36 @@ struct WorkoutDetailView: View {
     @ObservedObject var viewModel: ModelsViewModel
     @Binding var workout: Workout
 
+    @State private var selectedIndex: Int = 0
     @State private var selectedExercise: Exercise? = nil
     @State private var isAddingExercise: Bool = false
+    @State private var isDeleteMode: Bool = false
+
+    private var matchingWorkouts: [Workout] {
+        viewModel.workouts.filter { $0.name == workout.name }
+                          .sorted(by: { $0.date < $1.date })
+    }
+
+    private var numberOfSessions: Int {
+        matchingWorkouts.count
+    }
+
+    private var currentWorkout: Workout {
+        matchingWorkouts[selectedIndex]
+    }
+
+    private var formattedCurrentDate: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter.string(from: currentWorkout.date)
+    }
 
     var body: some View {
         NavigationView {
             List {
-                // Display exercises from the workout
-                ForEach(workout.exercises) { exercise in
+                ForEach(currentWorkout.exercises) { exercise in
                     Section(header: Text(exercise.name).font(.headline)) {
-                        // Display entries for the exercise
                         if exercise.entries.isEmpty {
                             Text("No entries yet.")
                                 .foregroundColor(.gray)
@@ -22,54 +42,133 @@ struct WorkoutDetailView: View {
                             ForEach(exercise.entries.sorted(by: { $0.date > $1.date })) { entry in
                                 HStack(alignment: .center, spacing: 16) {
                                     Text("Reps: \(entry.reps)")
-                                        .frame(maxWidth: .infinity, alignment: .leading)
                                     Text("Sets: \(entry.sets)")
-                                        .frame(maxWidth: .infinity, alignment: .center)
                                     Text("\(String(format: "%.1f", entry.weight)) kg")
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                    
+                                    if isDeleteMode {
+                                        Spacer()
+                                        Button(action: { clearSingleEntry(entry, for: exercise) }) {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.red)
+                                        }
+                                    }
                                 }
                                 .padding(.vertical, 4)
                             }
                         }
 
-                        // Add Entry Button
                         Button(action: { selectExercise(exercise) }) {
                             Text("Add")
-                                .fontWeight(.regular)
-                                .padding(.vertical, 4)
-                                .frame(maxWidth: .infinity)
                         }
                         .foregroundColor(Color.blue)
                     }
                 }
             }
-            .navigationTitle(workout.name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Clear All Entries Button in the Navigation Bar
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Clear All") {
-                        clearAllEntries()
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        if selectedIndex > 0 {
+                            selectedIndex -= 1
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
                     }
-                    .foregroundColor(.red)
+                    .disabled(selectedIndex == 0)
+                }
+
+                ToolbarItem(placement: .principal) {
+                    Text(formattedCurrentDate)
+                        .font(.headline)
+                }
+
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        if selectedIndex < numberOfSessions - 1 {
+                            selectedIndex += 1
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                    .disabled(selectedIndex == numberOfSessions - 1)
                 }
             }
             .sheet(isPresented: $isAddingExercise) {
                 addEntrySheet
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(isDeleteMode ? "Done" : "Edit") {
+                    isDeleteMode.toggle()
+                }
+            }
+        }
     }
 
-    // MARK: - Add Entry Sheet
     private var addEntrySheet: some View {
         AddEntryView(
             exercise: selectedExercise ?? Exercise(name: "Default Exercise", entries: []),
-            onSave: { newEntry in
-                saveEntry(newEntry)
-            }
+            onSave: saveEntry
         )
     }
 
-    // MARK: - Save Entry Logic
+    private func saveEntry(_ newEntry: ExerciseEntry) {
+        guard let selectedExercise = selectedExercise else { return }
+        
+        // Find the global workout index
+        if let workoutIndex = viewModel.workouts.firstIndex(where: { $0.id == currentWorkout.id }) {
+            // Find the exercise index in the workout
+            if let exerciseIndex = viewModel.workouts[workoutIndex].exercises.firstIndex(where: { $0.id == selectedExercise.id }) {
+                // Append the new entry
+                viewModel.workouts[workoutIndex].exercises[exerciseIndex].entries.append(newEntry)
+            }
+        }
+
+        // Update the corresponding global exercise
+        if let viewModelExerciseIndex = viewModel.exercises.firstIndex(where: { $0.id == selectedExercise.id }) {
+            viewModel.exercises[viewModelExerciseIndex].entries.append(newEntry)
+        }
+
+        // Persist the changes
+        PersistenceManager.saveWorkouts(viewModel.workouts)
+        PersistenceManager.saveExercises(viewModel.exercises)
+
+        isAddingExercise = false
+    }
+
+    private func clearAllEntries() {
+        if let workoutIndex = viewModel.workouts.firstIndex(where: { $0.id == currentWorkout.id }) {
+            for exerciseIndex in viewModel.workouts[workoutIndex].exercises.indices {
+                viewModel.workouts[workoutIndex].exercises[exerciseIndex].entries.removeAll()
+            }
+        }
+
+        // Persist changes
+        PersistenceManager.saveWorkouts(viewModel.workouts)
+    }
+    
+    private func clearSingleEntry(_ entry: ExerciseEntry, for exercise: Exercise) {
+        // Find the global workout index
+        if let workoutIndex = viewModel.workouts.firstIndex(where: { $0.id == currentWorkout.id }) {
+            // Find the exercise index in the workout
+            if let exerciseIndex = viewModel.workouts[workoutIndex].exercises.firstIndex(where: { $0.id == exercise.id }) {
+                // Remove the specific entry
+                viewModel.workouts[workoutIndex].exercises[exerciseIndex].entries.removeAll(where: { $0.id == entry.id })
+            }
+        }
+        
+        // Persist the changes
+        PersistenceManager.saveWorkouts(viewModel.workouts)
+    }
+    
+
+    private func selectExercise(_ exercise: Exercise) {
+        selectedExercise = exercise
+        isAddingExercise = true
+    }
+}
+    /*// MARK: - Save Entry Logic
     private func saveEntry(_ newEntry: ExerciseEntry) {
         guard let selectedExercise = selectedExercise else { return }
 
@@ -89,22 +188,4 @@ struct WorkoutDetailView: View {
 
         // Close the sheet
         isAddingExercise = false
-    }
-
-    // MARK: - Clear All Entries
-    private func clearAllEntries() {
-        // Clear entries only in the workout's exercises
-        for index in workout.exercises.indices {
-            workout.exercises[index].entries.removeAll()
-        }
-
-        // Persist the changes
-        PersistenceManager.saveWorkouts(viewModel.workouts)
-    }
-
-    // MARK: - Helper Methods
-    private func selectExercise(_ exercise: Exercise) {
-        selectedExercise = exercise
-        isAddingExercise = true
-    }
-}
+    }*/

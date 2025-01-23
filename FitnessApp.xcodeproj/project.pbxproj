@@ -13,7 +13,7 @@
 		5A83076E2D3C305B00C88096 /* AddExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A83076C2D3C305B00C88096 /* AddExerciseView.swift */; };
 		5A8307712D3C308200C88096 /* ModelsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A83076F2D3C307C00C88096 /* ModelsViewModel.swift */; };
 		5A8307772D3C309800C88096 /* PersistanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8307752D3C308E00C88096 /* PersistanceManager.swift */; };
-		5A83077D2D3C3F9B00C88096 /* ExerciseTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A83077C2D3C3F9000C88096 /* ExerciseTile.swift */; };
+		5A83077D2D3C3F9B00C88096 /* Unused.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A83077C2D3C3F9000C88096 /* Unused.swift */; };
 		5A83077F2D3C443000C88096 /* AddEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A83077E2D3C442700C88096 /* AddEntryView.swift */; };
 		5A8307812D3CFC2700C88096 /* AddExerciseSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8307802D3CFC1B00C88096 /* AddExerciseSheet.swift */; };
 		5A8307922D3D22EA00C88096 /* CustomButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A8307912D3D22E100C88096 /* CustomButtonStyle.swift */; };
@@ -50,7 +50,7 @@
 		5A83076C2D3C305B00C88096 /* AddExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExerciseView.swift; sourceTree = "<group>"; };
 		5A83076F2D3C307C00C88096 /* ModelsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsViewModel.swift; sourceTree = "<group>"; };
 		5A8307752D3C308E00C88096 /* PersistanceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceManager.swift; sourceTree = "<group>"; };
-		5A83077C2D3C3F9000C88096 /* ExerciseTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseTile.swift; sourceTree = "<group>"; };
+		5A83077C2D3C3F9000C88096 /* Unused.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unused.swift; sourceTree = "<group>"; };
 		5A83077E2D3C442700C88096 /* AddEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEntryView.swift; sourceTree = "<group>"; };
 		5A8307802D3CFC1B00C88096 /* AddExerciseSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddExerciseSheet.swift; sourceTree = "<group>"; };
 		5A8307912D3D22E100C88096 /* CustomButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButtonStyle.swift; sourceTree = "<group>"; };
@@ -162,7 +162,7 @@
 				5A8307952D3D780400C88096 /* AddWorkoutSheet.swift */,
 				5A8307802D3CFC1B00C88096 /* AddExerciseSheet.swift */,
 				5A83077E2D3C442700C88096 /* AddEntryView.swift */,
-				5A83077C2D3C3F9000C88096 /* ExerciseTile.swift */,
+				5A83077C2D3C3F9000C88096 /* Unused.swift */,
 				5A8307692D3C303D00C88096 /* ExerciseView.swift */,
 				5A83076C2D3C305B00C88096 /* AddExerciseView.swift */,
 			);
@@ -321,7 +321,7 @@
 				5A83076E2D3C305B00C88096 /* AddExerciseView.swift in Sources */,
 				5A8307772D3C309800C88096 /* PersistanceManager.swift in Sources */,
 				5A8307812D3CFC2700C88096 /* AddExerciseSheet.swift in Sources */,
-				5A83077D2D3C3F9B00C88096 /* ExerciseTile.swift in Sources */,
+				5A83077D2D3C3F9B00C88096 /* Unused.swift in Sources */,
 				5A83079A2D3D835700C88096 /* ExerciseRowView.swift in Sources */,
 				5A83077F2D3C443000C88096 /* AddEntryView.swift in Sources */,
 				5A8307962D3D781400C88096 /* AddWorkoutSheet.swift in Sources */,

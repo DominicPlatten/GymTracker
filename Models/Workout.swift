@@ -2,6 +2,7 @@ import Foundation
 
 struct Workout: Codable, Identifiable {
     let id: UUID
+    let date: Date
     var name: String
     var exercises: [Exercise]
     var trackingData: [UUID: ExerciseTracking] // Tracks progress per exercise
@@ -10,6 +11,7 @@ struct Workout: Codable, Identifiable {
 
     init(id: UUID = UUID(), name: String, exercises: [Exercise] = []) {
         self.id = id
+        self.date = Date()
         self.name = name
         self.exercises = exercises
         self.trackingData = [:]
